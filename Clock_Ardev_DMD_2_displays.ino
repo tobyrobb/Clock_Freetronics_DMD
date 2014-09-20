@@ -1,10 +1,8 @@
 /*
 
-Arduino Dev board
+Led Display clock based on my Arduino Dev board and a Freetronics DMD 
 
-20 Sep 2014
-
-Toby Robb
+20 Sep 2014 Toby Robb *uses freetronics DMD display library
 
 This is a clock sketch for the Arduino Development board running TWO DMD led displays
 
@@ -14,16 +12,15 @@ as per its subboard
  
 There is also a temperature thermistor connected
 
-NOTES:
 
-You must enable the internal pullups for the buttons by setting as inputs then writing HIGH
-The leds if fitted also require the pullups to be enabled
+NOTES:
+         This clock has serial support enabling setting the time through a bluetooth serial board and a smart phone.
+Look through the code for the commands or enter ! in the serial port @ 9600 baud to see commands displayed on clock.
 
 */
 
 // Includes
 
-#include <Servo.h>   // Include the servo library
 #include <Time.h>  
 #include <Wire.h>  
 #include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
@@ -68,25 +65,26 @@ unsigned int yearNow;
 unsigned int weekdayNow;
 
 int currentTemp = 0;
-int incomingByte;      // a variable to read incoming serial data into
-int brightness = 127;
+int incomingByte;      // A variable to read incoming serial data into
+int brightness = 127;  // Set initial brightness
     
 //Fire up the DMD library as dmd
-//Fire up the DMD library as dmd
+
 #define DISPLAYS_ACROSS 2
 #define DISPLAYS_DOWN 1
 DMD dmd(DISPLAYS_ACROSS, DISPLAYS_DOWN);
                
 void setup(){
   
-// Setup the serial
-
   Serial.begin(9600);
   Serial.println("Beginning Setup");
 
   pinMode(speakerPin, OUTPUT);  // If the speaker is fitted.
   pinMode(mosfet1Pin, OUTPUT);  // If the mosfet is fitted.
+  pinMode(thermistorPin, INPUT); //If the thermistor is fitted
   
+  currentTemp = Thermistor(analogRead(thermistorPin));           // read the opening temperature
+
   Wire.begin();
    setSyncProvider(RTC.get);   // the function to get the time from the RTC
   if(timeStatus()!= timeSet) 
@@ -94,24 +92,23 @@ void setup(){
   else
      Serial.println("RTC has set the system time");      
 
-
-  //initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
+//initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
    Timer1.initialize( 5000 );           //period in microseconds to call ScanDMD. Anything longer than 5000 (5ms) and you can see flicker.
    Timer1.attachInterrupt( ScanDMD );   //attach the Timer1 interrupt to ScanDMD which goes to dmd.scanDisplayBySPI()
 
-   //clear/init the DMD pixels held in RAM
+//clear/init the DMD pixels held in RAM
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
    dmd.selectFont(SystemFont5x7);  
    
-   //beep the buzzer
-Serial.println("Beep");
-tone(speakerPin, 1000);          // begin tone at 1000 hertz
-delay(150);                      // wait half a sec
-noTone(speakerPin);              // end beep
-
-
-delay(3000);
-dmd.clearScreen( true );
+//opening beep and display
+  Serial.println("Beep");
+  tone(speakerPin, 1000);          // begin tone at 1000 hertz
+  delay(150);                      // wait half a sec
+  noTone(speakerPin);              // end beep
+  dmd.drawString(  11,  0, "Arduino", 7, GRAPHICS_NORMAL );
+  dmd.drawString(  18,  9, "Clock" , 5, GRAPHICS_NORMAL );
+  delay(3000);
+  dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
 
 }
 
@@ -175,12 +172,12 @@ ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow,
 //if so then lets check for commands and exectue scripts if we find them 
 
 //beep the buzzer
-if (incomingByte == 'B') {
-Serial.println("Beep");
-tone(speakerPin, 1200);          // begin tone at 1000 hertz
-delay(150);                      // wait half a sec
-noTone(speakerPin);              // end beep
-delay(1000);
+  if (incomingByte == 'B') {
+  Serial.println("Beep");
+  tone(speakerPin, 1200);          // begin tone at 1000 hertz
+  delay(150);                      // wait half a sec
+  noTone(speakerPin);              // end beep
+  delay(1000);
 }
 
 //Increase the hour
@@ -326,8 +323,7 @@ void ScanDMD()
   flashing colon is on or off, show temperature, show day of week
 --------------------------------------------------------------------------------------*/
 void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature )
-{
-  //weekdayNow, dayNow, monthNow, minuteNow, true, hourNow, currentTemp
+{  //weekdayNow, dayNow, monthNow, minuteNow, true, hourNow, currentTemp
   
  //  dmd.clearScreen( true );
 
@@ -355,7 +351,6 @@ void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int ui
      case 7:
         dmd.drawString(  1,  0, "Sat", 3, GRAPHICS_NORMAL );
         break;
-      
   }
  
   //draw the day 
@@ -402,12 +397,11 @@ void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int ui
         break;
  }
  
- //draw the year
+//draw the year
    dmd.drawChar(  52,  0, '0'+((uiYear%100)  /10),   GRAPHICS_NORMAL );      // first digit
    dmd.drawChar(  58,  0, '0'+ (uiYear%10),          GRAPHICS_NORMAL );   // second digit
    
-  
- //draw the time
+//draw the time
    dmd.selectFont(System5x7);
    dmd.drawChar(  2,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
    dmd.drawChar(  8,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
@@ -415,8 +409,7 @@ void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int ui
    dmd.drawChar( 19,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
    dmd.drawChar( 25,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
    
-   
- // now show temperature
+// now show temperature
    dmd.drawChar(  33,  9,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
    dmd.drawChar(  39,  9, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
    dmd.drawString(  46, 9, "Deg", 3, GRAPHICS_NORMAL );  // show the word degreees
@@ -428,7 +421,6 @@ void showHelp(){
    dmd.selectFont(System5x7);
    dmd.drawString(  1,  0, "Hh Mm Dd Nn Yy", 14, GRAPHICS_NORMAL );
    dmd.drawString(  1,  9, "B +-" , 4, GRAPHICS_NORMAL );
-
 }  
 
 //Conversion code for the thermistor
