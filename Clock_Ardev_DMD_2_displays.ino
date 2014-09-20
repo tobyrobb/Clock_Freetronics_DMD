@@ -63,7 +63,7 @@ unsigned int dayNow;
 unsigned int monthNow;
 unsigned int yearNow;
 unsigned int weekdayNow;
-unsigned int pollDelay = 5000;   // time between temperature samples
+unsigned int pollDelay = 5000;   // time between temperature samples in milliSeconds
 unsigned int previousMillis; // A variable to hold the last millis time
 
 int currentTemp = 0;
@@ -128,7 +128,7 @@ analogWrite(mosfet1Pin, brightness);
    yearNow  = year();
    weekdayNow = weekday();
 
-// read the temperature every even second
+// read the temperature every pollDelay interval 
    if((millis() - previousMillis)>= pollDelay){
    currentTemp = Thermistor(analogRead(thermistorPin));           // read ADC and convert it to Celsius
    previousMillis = millis();
