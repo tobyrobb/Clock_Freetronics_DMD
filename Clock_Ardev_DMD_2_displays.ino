@@ -135,7 +135,7 @@ analogWrite(mosfet1Pin, brightness);
    Serial.print(hourNow);
    Serial.print(":");
    Serial.print(minuteNow);
-   Serial.print(" Day of week:");
+   Serial.print(" Day:");
    Serial.print(weekdayNow);
    Serial.print(" Date:");
    Serial.print(dayNow);
@@ -143,8 +143,11 @@ analogWrite(mosfet1Pin, brightness);
    Serial.print(monthNow);
    Serial.print(":");
    Serial.print(yearNow);
-   Serial.print(" Temperature is : ");
-   Serial.println(currentTemp);
+   Serial.print(" Temperature: ");
+   Serial.print(currentTemp);
+   Serial.print(" Brightness: ");
+   Serial.println(brightness);
+   
 
 // check if its on the hour and beep the clock if you like
 if((second() == 0) && (minute() == 0)){
@@ -284,7 +287,7 @@ ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow,
   brightness = brightness + 8;
   analogWrite(mosfet1Pin, brightness);
     if(brightness >=255){ 
-    brightness = 0;
+    brightness = 255;
    }
   Serial.println("Decreasing Brightness");
 }
@@ -294,7 +297,7 @@ ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow,
   brightness = brightness - 8;
   analogWrite(mosfet1Pin, brightness);
     if(brightness <= 0){ 
-    brightness = 255;
+    brightness = 0;
    }
   Serial.println("Decreasing Brightness");
 }
@@ -419,8 +422,8 @@ void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int ui
 void showHelp(){
    dmd.clearScreen( true );
    dmd.selectFont(System5x7);
-   dmd.drawString(  1,  0, "Hh Mm Dd Nn Yy", 14, GRAPHICS_NORMAL );
-   dmd.drawString(  1,  9, "B +-" , 4, GRAPHICS_NORMAL );
+   dmd.drawString(  0,  0, "Hh Mm Dd Nn Yy", 14, GRAPHICS_NORMAL );
+   dmd.drawString(  0,  9, "     B +-     " ,14, GRAPHICS_NORMAL );
 }  
 
 //Conversion code for the thermistor
