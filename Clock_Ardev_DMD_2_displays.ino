@@ -129,7 +129,8 @@ analogWrite(mosfet1Pin, brightness);
    weekdayNow = weekday();
 
 // read the temperature every pollDelay interval 
-   if((millis() - previousMillis)>= pollDelay){
+   int currentMillis = millis();
+   if((currentMillis - previousMillis) >= pollDelay){
    currentTemp = Thermistor(analogRead(thermistorPin));           // read ADC and convert it to Celsius
    previousMillis = millis();
   }
@@ -151,7 +152,6 @@ analogWrite(mosfet1Pin, brightness);
    Serial.print(" Brightness: ");
    Serial.println(brightness);
    
-
 // check if its on the hour and beep the clock if you like
 if((second() == 0) && (minute() == 0)){
   Serial.println("its right on the hour");
