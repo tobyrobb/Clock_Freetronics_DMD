@@ -56,13 +56,15 @@ Look through the code for the commands or enter ! in the serial port @ 9600 baud
 #define mosfet2Pin  9  // Mosfet 2 drive pin
 #define mosfet3Pin  10  // Mosfet 3 drive pin
 
-unsigned int hourNow;
+unsigned int hourNow;  //Self explanatory
 unsigned int minuteNow;
 unsigned int secondNow;
 unsigned int dayNow;
 unsigned int monthNow;
 unsigned int yearNow;
 unsigned int weekdayNow;
+unsigned int pollDelay = 5000;   // time between temperature samples
+unsigned int previousMillis; // A variable to hold the last millis time
 
 int currentTemp = 0;
 int incomingByte;      // A variable to read incoming serial data into
@@ -126,10 +128,11 @@ analogWrite(mosfet1Pin, brightness);
    yearNow  = year();
    weekdayNow = weekday();
 
-// read the temperature every even minute
-   if(minuteNow % 2 == 0){
+// read the temperature every even second
+   if((millis() - previousMillis)>= pollDelay){
    currentTemp = Thermistor(analogRead(thermistorPin));           // read ADC and convert it to Celsius
-   }
+   previousMillis = millis();
+  }
 
 // Print out some stuff so we can see in the serial terminal everythings OK
    Serial.print(hourNow);
