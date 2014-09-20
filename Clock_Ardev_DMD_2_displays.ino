@@ -305,13 +305,49 @@ ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow,
   Serial.println("Decreasing Brightness");
 }
 
+// Show the Info page 1
+  if (incomingByte == 'I') {
+   dmd.clearScreen( true );
+   delay(1000);
+   dmd.drawMarquee("  This is an Arduino based clock using the Freetronics DMD LED display",70,(32*DISPLAYS_ACROSS)-1,4);
+   long start=millis();
+   long timer=start;
+   boolean ret=false;
+   while(!ret){
+     if ((timer+35) < millis()) {
+       ret=dmd.stepMarquee(-1,0);
+       timer=millis();
+     }
+   }
+  delay(3000); 
+  dmd.clearScreen( true );
+ }
+
+// Show the Info page 2
+if (incomingByte == 'i') {  
+  dmd.clearScreen( true );
+   delay(1000);  
+   dmd.drawMarquee("For information, code and to build your own check out www.tobyrobb.com",70,(32*DISPLAYS_ACROSS)-1,4);
+   long start=millis();
+   long timer=start;
+   boolean ret=false;
+   while(!ret){
+     if ((timer+35) < millis()) {
+       ret=dmd.stepMarquee(-1,0);
+       timer=millis();
+     }
+   }
+  delay(3000); 
+  dmd.clearScreen( true );
+ }
+
 // Show the help page
   if (incomingByte == '!') {
   showHelp();
   delay(3000); 
   dmd.clearScreen( true );
- 
-}
+ }
+
 }
 }
 
@@ -424,9 +460,13 @@ void ShowDisplayData( unsigned int uiWeekday,unsigned int uiDay, unsigned int ui
 //Display the help screen
 void showHelp(){
    dmd.clearScreen( true );
+   tone(speakerPin, 1200);          // begin tone at 1000 hertz
+   delay(150);                      // wait half a sec
+   noTone(speakerPin);              // end beep
    dmd.selectFont(System5x7);
-   dmd.drawString(  0,  0, "Hh Mm Dd Nn Yy", 14, GRAPHICS_NORMAL );
-   dmd.drawString(  0,  9, "     B +-     " ,14, GRAPHICS_NORMAL );
+   dmd.drawString(  0,  0, "Hh Mm Dd Nn", 11, GRAPHICS_NORMAL );
+   dmd.drawString(  0,  9, "Yy B  +- Ii" ,11, GRAPHICS_NORMAL );
+   delay(1000);
 }  
 
 //Conversion code for the thermistor
