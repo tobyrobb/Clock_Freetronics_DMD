@@ -1,6 +1,6 @@
 /*
 
-Led Display clock based on my Arduino Dev board and a Freetronics DMD 
+Led Display clock based on a standard Arduino board, clock shield and a Freetronics DMD 
 
 20 Sep 2014 Toby Robb *uses freetronics DMD display library
 
@@ -10,12 +10,12 @@ the dmd display connects to D9,10,11,12,13 and gnd
 
 as per its subboard
  
-There is also a temperature thermistor connected
+There is also a temperature thermistor connected and a mosfet for dimming
 
 
 NOTES:
-         This clock has serial support enabling setting the time through a bluetooth serial board and a smart phone.
-Look through the code for the commands or enter ! in the serial port @ 9600 baud to see commands displayed on clock.
+         This clock has mySerial support enabling setting the time through a bluetooth mySerial board and a smart phone.
+Look through the code for the commands or enter ! in the mySerial port @ 9600 baud to see commands displayed on clock.
 
 */
 
@@ -24,6 +24,7 @@ Look through the code for the commands or enter ! in the serial port @ 9600 baud
 #include <Time.h>  
 #include <Wire.h>  
 #include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
+#include <SoftwareSerial.h>
 
 #include <SPI.h>        //SPI.h must be included as DMD is written by SPI (the IDE complains otherwise)
 #include <DMD.h>        //
@@ -32,29 +33,13 @@ Look through the code for the commands or enter ! in the serial port @ 9600 baud
 
 // Defines (mostly as per the standard Arddev board)
 
-#define ldrPin A2 // Light dependant resistor pin on board.
-#define thermistorPin A3  //Temperature thermistor pin on board.
-#define ledPin 8  // Led pin High for one colour Low for another
 #define speakerPin 4  // The onboard speaker pin
-#define relayPin 2 // Pin for the relay 
-#define sparePin 13    //Spare pin breakout on board
+#define mosfet1Pin  5  // Mosfet 1 drive pin must be a PWM port
 
+#define thermistorPin A3  //Temperature thermistor pin on board.
 #define dataPin A4  // The I2C bus DATA pin  
 #define clockPin A5  // The I2C CLOCK pin
 
-#define pot1Pin A0 // Number 1 potentiometer on the board.
-#define pot2Pin A1 // Number 2 potentiometer on the board.
-
-#define button1Pin 7  // Button 1 pin
-#define button2Pin 12 // Button 2 pin
-
-#define gpio1Pin 5     // General Purpose Input/output 1 pin
-#define gpio2Pin 6    // General Purpose Input/output 2 pin
-#define gpio3Pin 11    // General Purpose Input/output 3 pin
-
-#define mosfet1Pin  3  // Mosfet 1 drive pin
-#define mosfet2Pin  9  // Mosfet 2 drive pin
-#define mosfet3Pin  10  // Mosfet 3 drive pin
 
 unsigned int hourNow;  //Self explanatory
 unsigned int minuteNow;
@@ -67,9 +52,11 @@ unsigned int pollDelay = 5000;   // time between temperature samples in milliSec
 unsigned int previousMillis; // A variable to hold the last millis time
 
 int currentTemp = 0;
-int incomingByte;      // A variable to read incoming serial data into
-int brightness = 127;  // Set initial brightness
+int incomingByte;      // A variable to read incoming mySerial data into
+int brightness = 255;  // Set initial brightness, lower number is brighter with P channel mosfets
     
+SoftwareSerial mySerial(2, 3); // RX, TX   // setup a software serial port
+
 //Fire up the DMD library as dmd
 
 #define DISPLAYS_ACROSS 2
@@ -78,21 +65,24 @@ DMD dmd(DISPLAYS_ACROSS, DISPLAYS_DOWN);
                
 void setup(){
   
-  Serial.begin(9600);
-  Serial.println("Beginning Setup");
+  mySerial.begin(9600);
+  mySerial.println("Beginning Setup");
 
   pinMode(speakerPin, OUTPUT);  // If the speaker is fitted.
   pinMode(mosfet1Pin, OUTPUT);  // If the mosfet is fitted.
-  pinMode(thermistorPin, INPUT); //If the thermistor is fitted
   
+  pinMode(thermistorPin, INPUT); //If the thermistor is fitted
+
+  analogWrite(mosfet1Pin, brightness);  //Set the boot up brightness
+
   currentTemp = Thermistor(analogRead(thermistorPin));           // read the opening temperature
 
   Wire.begin();
    setSyncProvider(RTC.get);   // the function to get the time from the RTC
   if(timeStatus()!= timeSet) 
-     Serial.println("Unable to sync with the RTC");
+     mySerial.println("Unable to sync with the RTC");
   else
-     Serial.println("RTC has set the system time");      
+     mySerial.println("RTC has set the system time");      
 
 //initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
    Timer1.initialize( 5000 );           //period in microseconds to call ScanDMD. Anything longer than 5000 (5ms) and you can see flicker.
@@ -103,7 +93,7 @@ void setup(){
    dmd.selectFont(SystemFont5x7);  
    
 //opening beep and display
-  Serial.println("Beep");
+  mySerial.println("Beep");
   tone(speakerPin, 1000);          // begin tone at 1000 hertz
   delay(150);                      // wait half a sec
   noTone(speakerPin);              // end beep
@@ -128,36 +118,37 @@ analogWrite(mosfet1Pin, brightness);
    yearNow  = year();
    weekdayNow = weekday();
 
-// read the temperature every pollDelay interval 
+//  every pollDelay interval read the temperature and print the time to serial
    int currentMillis = millis();
    if((currentMillis - previousMillis) >= pollDelay){
    currentTemp = Thermistor(analogRead(thermistorPin));           // read ADC and convert it to Celsius
    previousMillis = millis();
+   // Print out some stuff so we can see in the mySerial terminal everythings OK
+   mySerial.print(hourNow);
+   mySerial.print(":");
+   mySerial.print(minuteNow);
+   mySerial.print(" Day:");
+   mySerial.print(weekdayNow);
+   mySerial.print(" Date:");
+   mySerial.print(dayNow);
+   mySerial.print(":");
+   mySerial.print(monthNow);
+   mySerial.print(":");
+   mySerial.print(yearNow);
+   mySerial.print(" Temperature: ");
+   mySerial.print(currentTemp);
+   mySerial.print(" Brightness: ");
+   mySerial.println(brightness);
   }
 
-// Print out some stuff so we can see in the serial terminal everythings OK
-   Serial.print(hourNow);
-   Serial.print(":");
-   Serial.print(minuteNow);
-   Serial.print(" Day:");
-   Serial.print(weekdayNow);
-   Serial.print(" Date:");
-   Serial.print(dayNow);
-   Serial.print(":");
-   Serial.print(monthNow);
-   Serial.print(":");
-   Serial.print(yearNow);
-   Serial.print(" Temperature: ");
-   Serial.print(currentTemp);
-   Serial.print(" Brightness: ");
-   Serial.println(brightness);
+
    
 // check if its on the hour and beep the clock if you like
 if((second() == 0) && (minute() == 0)){
-  Serial.println("its right on the hour");
+  mySerial.println("its right on the hour");
 //beep the buzzer
-Serial.println("Beep");
-tone(speakerPin, 1200);          // begin tone at 1000 hertz
+mySerial.println("Beep");
+tone(speakerPin, 1200);          // begin tone at 1200 hertz
 delay(150);                      // wait half a sec
 noTone(speakerPin);              // end beep
 delay(1000);
@@ -167,19 +158,19 @@ delay(1000);
 
 ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow, currentTemp );  //Show clock
    
-//Time to make available a bunch of serial commands.
+//Time to make available a bunch of mySerial commands.
 
-// see if there's incoming serial data
-  if (Serial.available() > 0) {
-    // read the oldest byte in the serial buffer:
-    incomingByte = Serial.read();
-    Serial.print("Incoming byte  =   ");
+// see if there's incoming mySerial data
+  if (mySerial.available() > 0) {
+    // read the oldest byte in the mySerial buffer:
+    incomingByte = mySerial.read();
+    mySerial.print("Incoming byte  =   ");
   
 //if so then lets check for commands and exectue scripts if we find them 
 
 //beep the buzzer
   if (incomingByte == 'B') {
-  Serial.println("Beep");
+  mySerial.println("Beep");
   tone(speakerPin, 1200);          // begin tone at 1000 hertz
   delay(150);                      // wait half a sec
   noTone(speakerPin);              // end beep
@@ -189,120 +180,123 @@ ShowDisplayData(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow,
 //Increase the hour
   if (incomingByte == 'H') {
   hourNow++;
-  if(hourNow  >=23){hourNow = 23;}
+  if(hourNow  > 23){hourNow = 0;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Increasing hour");
+  mySerial.println("Increasing hour");
   delay(100);
 }
 
 //Decrease the hour
   if (incomingByte == 'h') {
   hourNow--;
-  if(hourNow <=0){hourNow = 0;}
+  if(hourNow < 0){hourNow = 23;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Decreasing hour");
+  mySerial.println("Decreasing hour");
   delay(100);
 }
 
 //Increase the minute
   if (incomingByte == 'M') {
   minuteNow++;
-  if(minuteNow >=59){minuteNow = 59;}
+  if(minuteNow > 59){minuteNow = 0;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Increasing minute");
+  mySerial.println("Increasing minute");
   delay(100);
 }
 
 //decrease the minute
   if (incomingByte == 'm') {
   minuteNow--;
+  if(minuteNow < 0){minuteNow = 59;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Decreasing minute");
+  mySerial.println("Decreasing minute");
   delay(100);
 }
 
 // Increase the day
   if (incomingByte == 'D') {
   dayNow++;
-  if(dayNow >=31){dayNow = 0;}
+  if(dayNow > 31){dayNow = 0;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Increasing Day");
+  mySerial.println("Increasing Day");
   delay(100);
 }
 
 // Decrease the day
   if (incomingByte == 'd') {
   dayNow--;
-  if(dayNow <=0){dayNow = 31;}
+  if(dayNow < 0){dayNow = 31;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Decreasing Day");
+  mySerial.println("Decreasing Day");
   delay(100);
 }
 
 // Increase the month
   if (incomingByte == 'N') {
   monthNow++;
-  if(monthNow >=12){monthNow = 12;}
+  if(monthNow > 12){monthNow = 1;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Increasing Month");
+  mySerial.println("Increasing Month");
   delay(100);
 }
 
 // Decrease the month
   if (incomingByte == 'n') {
   monthNow--;
-  if(monthNow <=1){monthNow = 1;}
+  if(monthNow < 1){monthNow = 12;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Decreasing Month");
+  mySerial.println("Decreasing Month");
   delay(100);
 }
 
 // Increase year
   if (incomingByte == 'Y') {
   yearNow++;
-  if(yearNow >=2050){yearNow = 2050;}
+  if(yearNow > 2099){yearNow = 0;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Increasing Year");
+  mySerial.println("Increasing Year");
   delay(100);
 }
 
 // Decrease year
   if (incomingByte == 'y') {
   yearNow--;
-  if(yearNow <= 2000){yearNow = 2000;}
+  if(yearNow < 0){yearNow = 2099;}
   setTime(hourNow,minuteNow,secondNow,dayNow,monthNow,yearNow);
   RTC.set(now());
-  Serial.println("Decreasing Year");
+  mySerial.println("Decreasing Year");
   delay(100);
 }
 
 // increase brightness
+ 
   if (incomingByte == '+') {
   brightness = brightness + 8;
-  analogWrite(mosfet1Pin, brightness);
-    if(brightness >=255){ 
+    if(brightness > 255){ 
     brightness = 255;
+    analogWrite(mosfet1Pin, brightness);
    }
-  Serial.println("Decreasing Brightness");
-}
+   mySerial.println("Increasing Brightness");
+} 
 
 // decrease brightness
-  if (incomingByte == '-') {
+
+if (incomingByte == '-') {
   brightness = brightness - 8;
-  analogWrite(mosfet1Pin, brightness);
-    if(brightness <= 0){ 
+    if(brightness < 0){ 
     brightness = 0;
+    analogWrite(mosfet1Pin, brightness);
    }
-  Serial.println("Decreasing Brightness");
+    mySerial.println("Decreasing Brightness");
 }
 
 // Show the Info page 1
@@ -484,9 +478,9 @@ double Thermistor(int RawADC) {
  Temp = Temp - 273.15;  // Convert Kelvin to Celsius                                         // Now it only means "Temperature"
 
 // // BEGIN- Remove these lines for the function not to display anything
-//  Serial.print("ADC: "); Serial.print(RawADC); Serial.print("/1024");  // Print out RAW ADC Number
-//  Serial.print(", Volts: "); printDouble(((RawADC*5)/1024.0),3);   // 4.860 volts is what my USB Port outputs.
-//  Serial.print(", Resistance: "); Serial.print(Resistance); Serial.print("ohms");
+//  mySerial.print("ADC: "); mySerial.print(RawADC); mySerial.print("/1024");  // Print out RAW ADC Number
+//  mySerial.print(", Volts: "); printDouble(((RawADC*5)/1024.0),3);   // 4.860 volts is what my USB Port outputs.
+//  mySerial.print(", Resistance: "); mySerial.print(Resistance); mySerial.print("ohms");
 // // END- Remove these lines for the function not to display anything
 
  // Uncomment this line for the function to return Fahrenheit instead.
