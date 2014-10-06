@@ -60,7 +60,7 @@ unsigned int yearNow;
 unsigned int weekdayNow;
 unsigned int pollDelay = 5000;   // time between temperature samples in milliSeconds
 unsigned int previousMillis; // A variable to hold the last millis time
-unsigned int mode = 2; // a variable to hold the mode
+unsigned int mode = 4; // a variable to hold the mode
 
 int currentTemp = 0;
 int incomingByte;      // A variable to read incoming mySerial data into
@@ -184,25 +184,29 @@ ShowDisplayData(mode);  //Show clock
       mode = 1;
       mySerial.print("Mode: ");
       mySerial.println(mode);
+      dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
   }
   
   if (incomingByte == '2') {
       mode = 2;
       mySerial.print("Mode: ");
       mySerial.println(mode);
+      dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
   }
   
   if (incomingByte == '3') {
       mode = 3;
       mySerial.print("Mode: ");
       mySerial.println(mode);
+      dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
   }
   
   if (incomingByte == '4') {
       mode = 4;
       mySerial.print("Mode: ");
       mySerial.println(mode);
-  }
+      dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+}
   
   
 //beep the buzzer
@@ -599,10 +603,6 @@ switch(uiMonth){
         break;
  }
  
-////draw the year
-//   dmd.drawChar(  52,  0, '0'+((uiYear%100)  /10),   GRAPHICS_NORMAL );      // first digit
-//   dmd.drawChar(  58,  0, '0'+ (uiYear%10),          GRAPHICS_NORMAL );   // second digit
-   
 //draw the time
    dmd.selectFont(System5x7);
    dmd.drawChar(  35,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
@@ -621,182 +621,79 @@ switch(uiMonth){
 
 void mode3Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature){
 
- // Show day of week
-   switch(uiWeekday){
-     case 1:
-        dmd.drawString(  1,  0, "Sun", 3, GRAPHICS_NORMAL );
-        break;
-     case 2:
-        dmd.drawString(  1,  0, "Mon", 3, GRAPHICS_NORMAL );
-        break;
-     case 3:
-        dmd.drawString(  1,  0, "Tue", 3, GRAPHICS_NORMAL );
-        break;
-     case 4:
-        dmd.drawString(  1,  0, "Wed", 3, GRAPHICS_NORMAL );
-        break;
-     case 5:
-        dmd.drawString(  1,  0, "Thu", 3, GRAPHICS_NORMAL );
-        break;
-     case 6:
-        dmd.drawString(  1,  0, "Fri", 3, GRAPHICS_NORMAL );
-        break;
-     case 7:
-        dmd.drawString(  1,  0, "Sat", 3, GRAPHICS_NORMAL );
-        break;
-  }
+// now show temperature
+   dmd.drawChar(  3,  0,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  9,  0, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawString(  20, 0, "Degrees", 7, GRAPHICS_NORMAL );  // show the word degreees
  
-  //draw the day 
-   dmd.drawChar(  20,  0, '0'+((uiDay%100)  /10),   GRAPHICS_NORMAL );      // first digit
-   dmd.drawChar(  26,  0, '0'+ (uiDay%10),          GRAPHICS_NORMAL );   // second digit
-
- //draw the month
-   switch(uiMonth){
-     case 1:
-        dmd.drawString(  33,  0, "Jan", 3, GRAPHICS_NORMAL );
-        break;
-     case 2:
-        dmd.drawString(  33,  0, "Feb", 3, GRAPHICS_NORMAL );
-        break;
-      case 3:
-        dmd.drawString(  33,  0, "Mar", 3, GRAPHICS_NORMAL );
-        break;
-      case 4:
-        dmd.drawString(  33,  0, "Apr", 3, GRAPHICS_NORMAL );
-        break;
-      case 5:
-        dmd.drawString(  33,  0, "May", 3, GRAPHICS_NORMAL );
-        break;
-      case 6:
-        dmd.drawString(  33,  0, "Jun", 3, GRAPHICS_NORMAL );
-        break;
-      case 7:
-        dmd.drawString(  33,  0, "Jul", 3, GRAPHICS_NORMAL );
-        break;
-      case 8:
-        dmd.drawString(  33,  0, "Aug", 3, GRAPHICS_NORMAL );
-        break;
-      case 9:
-        dmd.drawString(  33,  0, "Sep", 3, GRAPHICS_NORMAL );
-        break;
-      case 10:
-        dmd.drawString(  33,  0, "Oct", 3, GRAPHICS_NORMAL );
-        break;
-      case 11:
-        dmd.drawString(  33,  0, "Nov", 3, GRAPHICS_NORMAL );
-        break;
-      case 12:
-        dmd.drawString(  33,  0, "Dec", 3, GRAPHICS_NORMAL );
-        break;
- }
- 
-//draw the year
-   dmd.drawChar(  52,  0, '0'+((uiYear%100)  /10),   GRAPHICS_NORMAL );      // first digit
-   dmd.drawChar(  58,  0, '0'+ (uiYear%10),          GRAPHICS_NORMAL );   // second digit
-   
 //draw the time
    dmd.selectFont(System5x7);
-   dmd.drawChar(  2,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  8,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawChar(  14,  9,'.', GRAPHICS_NORMAL );   // colon
-   dmd.drawChar( 19,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
-   dmd.drawChar( 25,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
+   dmd.drawChar(  18,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  24,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawChar(  30,  9,'.', GRAPHICS_NORMAL );   // colon
+   dmd.drawChar( 35,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
+   dmd.drawChar( 41,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
    
-// now show temperature
-   dmd.drawChar(  33,  9,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  39,  9, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawString(  46, 9, "Deg", 3, GRAPHICS_NORMAL );  // show the word degreees
 
 //end of the display routine
 }
 
 void mode4Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature){
 
+  
+    // check if its on the hour and beep the clock if you like
+if((second() == 0) && (minute() == 0)){
+  mySerial.println("its right on the hour");
+//beep the buzzer
+mySerial.println("Beep");
+tone(speakerPin, 1200);          // begin tone at 1200 hertz
+delay(150);                      // wait half a sec
+noTone(speakerPin);              // end beep
+   dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+// now show temperature
+   dmd.drawChar(  3,  4,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  9,  4, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawString(  20, 4, "Degrees", 7, GRAPHICS_NORMAL );  // show the word degreees
+   delay(3000);
+   dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+}
+
  // Show day of week
    switch(uiWeekday){
      case 1:
-        dmd.drawString(  1,  0, "Sun", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Sunday", 6, GRAPHICS_NORMAL );
         break;
      case 2:
-        dmd.drawString(  1,  0, "Mon", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Monday", 6, GRAPHICS_NORMAL );
         break;
      case 3:
-        dmd.drawString(  1,  0, "Tue", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Tuesday", 7, GRAPHICS_NORMAL );
         break;
      case 4:
-        dmd.drawString(  1,  0, "Wed", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Wednesday", 9, GRAPHICS_NORMAL );
         break;
      case 5:
-        dmd.drawString(  1,  0, "Thu", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Thursday", 8, GRAPHICS_NORMAL );
         break;
      case 6:
-        dmd.drawString(  1,  0, "Fri", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Friday", 6, GRAPHICS_NORMAL );
         break;
      case 7:
-        dmd.drawString(  1,  0, "Sat", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  1,  0, "Saturday", 8, GRAPHICS_NORMAL );
         break;
   }
  
   //draw the day 
-   dmd.drawChar(  20,  0, '0'+((uiDay%100)  /10),   GRAPHICS_NORMAL );      // first digit
-   dmd.drawChar(  26,  0, '0'+ (uiDay%10),          GRAPHICS_NORMAL );   // second digit
+   dmd.drawChar(  52,  0, '0'+((uiDay%100)  /10),   GRAPHICS_NORMAL );      // first digit
+   dmd.drawChar(  59,  0, '0'+ (uiDay%10),          GRAPHICS_NORMAL );   // second digit
 
- //draw the month
-   switch(uiMonth){
-     case 1:
-        dmd.drawString(  33,  0, "Jan", 3, GRAPHICS_NORMAL );
-        break;
-     case 2:
-        dmd.drawString(  33,  0, "Feb", 3, GRAPHICS_NORMAL );
-        break;
-      case 3:
-        dmd.drawString(  33,  0, "Mar", 3, GRAPHICS_NORMAL );
-        break;
-      case 4:
-        dmd.drawString(  33,  0, "Apr", 3, GRAPHICS_NORMAL );
-        break;
-      case 5:
-        dmd.drawString(  33,  0, "May", 3, GRAPHICS_NORMAL );
-        break;
-      case 6:
-        dmd.drawString(  33,  0, "Jun", 3, GRAPHICS_NORMAL );
-        break;
-      case 7:
-        dmd.drawString(  33,  0, "Jul", 3, GRAPHICS_NORMAL );
-        break;
-      case 8:
-        dmd.drawString(  33,  0, "Aug", 3, GRAPHICS_NORMAL );
-        break;
-      case 9:
-        dmd.drawString(  33,  0, "Sep", 3, GRAPHICS_NORMAL );
-        break;
-      case 10:
-        dmd.drawString(  33,  0, "Oct", 3, GRAPHICS_NORMAL );
-        break;
-      case 11:
-        dmd.drawString(  33,  0, "Nov", 3, GRAPHICS_NORMAL );
-        break;
-      case 12:
-        dmd.drawString(  33,  0, "Dec", 3, GRAPHICS_NORMAL );
-        break;
- }
- 
-//draw the year
-   dmd.drawChar(  52,  0, '0'+((uiYear%100)  /10),   GRAPHICS_NORMAL );      // first digit
-   dmd.drawChar(  58,  0, '0'+ (uiYear%10),          GRAPHICS_NORMAL );   // second digit
-   
 //draw the time
    dmd.selectFont(System5x7);
-   dmd.drawChar(  2,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  8,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawChar(  14,  9,'.', GRAPHICS_NORMAL );   // colon
-   dmd.drawChar( 19,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
-   dmd.drawChar( 25,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
-   
-// now show temperature
-   dmd.drawChar(  33,  9,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  39,  9, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawString(  46, 9, "Deg", 3, GRAPHICS_NORMAL );  // show the word degreees
+   dmd.drawChar(  18,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  24,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawChar(  30,  9,'.', GRAPHICS_NORMAL );   // colon
+   dmd.drawChar( 35,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
+   dmd.drawChar( 41,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
 
 //end of the display routine
 }
