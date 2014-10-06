@@ -26,6 +26,7 @@ Add holiday messages
 Add seasons display
 Add daylight savings support
 Add rising or cooling temperature display
+add a word clock mode eg Seven Forty Four PM
 
 */
 
@@ -58,9 +59,9 @@ unsigned int dayNow;
 unsigned int monthNow;
 unsigned int yearNow;
 unsigned int weekdayNow;
-unsigned int pollDelay = 5000;   // time between temperature samples in milliSeconds
+unsigned int pollDelay = 3000;   // time between temperature samples in milliSeconds
 unsigned int previousMillis; // A variable to hold the last millis time
-unsigned int mode = 4; // a variable to hold the mode
+unsigned int mode = 3; // a variable to hold the mode
 
 int currentTemp = 0;
 int incomingByte;      // A variable to read incoming mySerial data into
@@ -206,6 +207,14 @@ ShowDisplayData(mode);  //Show clock
       mySerial.print("Mode: ");
       mySerial.println(mode);
       dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+  
+  if (incomingByte == '5') {
+      mode = 5;
+      mySerial.print("Mode: ");
+      mySerial.println(mode);
+      dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+  }
+  
 }
   
   
@@ -419,6 +428,9 @@ switch(mode){
     break;
   case 4:
     mode4Display(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow, currentTemp);
+    break;
+  case 5:
+    mode5Display(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow, currentTemp);
     break;
   default:
     mode1Display(weekdayNow, dayNow, monthNow, yearNow, minuteNow, true, hourNow, currentTemp);
@@ -698,6 +710,184 @@ noTone(speakerPin);              // end beep
 //end of the display routine
 }
 
+void mode5Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature){
+
+   // Show hour
+   switch(uiHour){
+     case 1:
+        dmd.drawString(  0,  0, "One", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 2:
+        dmd.drawString(  0,  0, "Two", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 3:
+        dmd.drawString(  0,  0, "Three", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 4:
+        dmd.drawString(  0,  0, "Four", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 5:
+        dmd.drawString(  0,  0, "Five", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 6:
+        dmd.drawString(  0,  0, "Six", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 7:
+        dmd.drawString(  0,  0, "Seven", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 8:
+        dmd.drawString(  0,  0, "Eight", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 9:
+        dmd.drawString(  0,  0, "Nine", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 10:
+        dmd.drawString(  0,  0, "Ten", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 11:
+        dmd.drawString(  0,  0, "Eleven", 6, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+     case 12:
+        dmd.drawString(  0,  0, "Twelve", 6, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 13:
+        dmd.drawString(  0,  0, "One", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 14:
+        dmd.drawString(  0,  0, "Two", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 15:
+        dmd.drawString(  0,  0, "Three", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 16:
+        dmd.drawString(  0,  0, "Four", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 17:
+        dmd.drawString(  0,  0, "Five", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 18:
+        dmd.drawString(  0,  0, "Six", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 19:
+        dmd.drawString(  0,  0, "Seven", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 20:
+        dmd.drawString(  0,  0, "Eight", 5, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 21:
+        dmd.drawString(  0,  0, "Nine", 4, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 22:
+        dmd.drawString(  0,  0, "Ten", 3, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 23:
+        dmd.drawString(  0,  0, "Eleven", 6, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        break;
+     case 24:
+        dmd.drawString(  0,  0, "Twelve", 6, GRAPHICS_NORMAL );
+        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        break;
+}
+
+// Show hour
+
+if(uiMinute<=19){    // only run this below 20
+
+
+if(uiMinute == 1){
+        dmd.drawString(  22,  9, "One", 3, GRAPHICS_NORMAL );
+}
+
+if(uiMinute == 2){
+        dmd.drawString(  22,  9, "Two", 3, GRAPHICS_NORMAL );
+}
+
+// end of below 20 display
+}
+
+
+if(uiMinute>=19){    // only run this above 20
+
+if(uiMinute >=20 && uiMinute < 30){
+        dmd.drawString(  30,  0, "Twenty", 6, GRAPHICS_NORMAL );
+}
+if(uiMinute >=30 && uiMinute < 40){
+        dmd.drawString(  30,  0, "Thirty", 6, GRAPHICS_NORMAL );
+}
+if(uiMinute >=40 && uiMinute < 50){
+        dmd.drawString(  35,  0, "Forty", 5, GRAPHICS_NORMAL );
+}
+if(uiMinute >=50 && uiMinute < 60){
+        dmd.drawString(  35,  0, "Fifty", 5, GRAPHICS_NORMAL );
+}
+
+ 
+if(uiMinute%10 == 1){
+        dmd.drawString(  11,  9, "One", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 2){
+        dmd.drawString(  11,  9, "Two", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 3){
+        dmd.drawString(  11,  9, "Three", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 4){
+        dmd.drawString(  11,  9, "Four", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 5){
+        dmd.drawString(  11,  9, "Five", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 6){
+        dmd.drawString(  11,  9, "Six", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 7){
+        dmd.drawString(  11,  9, "Seven", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 8){
+        dmd.drawString(  11,  9, "Eight", 5, GRAPHICS_NORMAL );
+}
+
+if(uiMinute%10 == 9){
+        dmd.drawString(  11,  9, "Nine", 5, GRAPHICS_NORMAL );
+}
+
+// end of above 20 display
+}
+
+//end of the display routine
+}
+
+//end of modes
 
 //Display the help screen
 void showHelp(){
