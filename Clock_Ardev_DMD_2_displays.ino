@@ -2,7 +2,7 @@
 
 Led Display clock based on a standard Arduino board, clock shield and a Freetronics DMD 
 
-20 Sep 2014 Toby Robb *uses freetronics DMD display library
+16 feb 2015 Toby Robb *uses freetronics DMD display library
 
 This is a clock sketch for the Arduino Development board running TWO DMD led displays
 
@@ -383,6 +383,13 @@ if (incomingByte == 'i') {
  }
 
 // Show the help page
+  if (incomingByte == '?') {
+  showToday(monthNow, dayNow);
+  delay(3000); 
+  dmd.clearScreen( true );
+ }
+ 
+// Show the help page
   if (incomingByte == '!') {
   showHelp();
   delay(3000); 
@@ -696,182 +703,206 @@ void mode4Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMont
 
 void mode5Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature){
 
-   // Show hour
+  // Show hour
    switch(uiHour){
      case 1:
         dmd.drawString(  0,  0, "One", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 2:
         dmd.drawString(  0,  0, "Two", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 3:
         dmd.drawString(  0,  0, "Three", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 4:
         dmd.drawString(  0,  0, "Four", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 5:
         dmd.drawString(  0,  0, "Five", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 6:
         dmd.drawString(  0,  0, "Six", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 7:
         dmd.drawString(  0,  0, "Seven", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 8:
         dmd.drawString(  0,  0, "Eight", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 9:
         dmd.drawString(  0,  0, "Nine", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 10:
         dmd.drawString(  0,  0, "Ten", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 11:
         dmd.drawString(  0,  0, "Eleven", 6, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
      case 12:
         dmd.drawString(  0,  0, "Twelve", 6, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 13:
         dmd.drawString(  0,  0, "One", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 14:
         dmd.drawString(  0,  0, "Two", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 15:
         dmd.drawString(  0,  0, "Three", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 16:
         dmd.drawString(  0,  0, "Four", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 17:
         dmd.drawString(  0,  0, "Five", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 18:
         dmd.drawString(  0,  0, "Six", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 19:
         dmd.drawString(  0,  0, "Seven", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 20:
         dmd.drawString(  0,  0, "Eight", 5, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 21:
         dmd.drawString(  0,  0, "Nine", 4, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 22:
         dmd.drawString(  0,  0, "Ten", 3, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 23:
         dmd.drawString(  0,  0, "Eleven", 6, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "PM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "PM", 2, GRAPHICS_NORMAL );
         break;
      case 24:
         dmd.drawString(  0,  0, "Twelve", 6, GRAPHICS_NORMAL );
-        dmd.drawString(  46,  9, "AM", 2, GRAPHICS_NORMAL );
+        dmd.drawString(  53,  9, "AM", 2, GRAPHICS_NORMAL );
         break;
 }
 
-// Show hour
+// Show minute
 
-if(uiMinute<=19){    // only run this below 20
-
-
+if(uiMinute <=19){
+  
+if(uiMinute == 0){
+  dmd.drawString(  0,  9, "Oh Clock", 8, GRAPHICS_NORMAL );
+}
+  
 if(uiMinute == 1){
-        dmd.drawString(  22,  9, "One", 3, GRAPHICS_NORMAL );
+  dmd.drawString(  0,  9, "Oh One  ", 8, GRAPHICS_NORMAL );
 }
 
 if(uiMinute == 2){
-        dmd.drawString(  22,  9, "Two", 3, GRAPHICS_NORMAL );
+  dmd.drawString(  0,  9, "Oh Two  ", 8, GRAPHICS_NORMAL );
 }
 
-// end of below 20 display
+if(uiMinute == 3){
+  dmd.drawString(  0,  9, "Oh Three", 8, GRAPHICS_NORMAL );
 }
 
-
-if(uiMinute>=19){    // only run this above 20
-
-if(uiMinute >=20 && uiMinute < 30){
-        dmd.drawString(  30,  0, "Twenty", 6, GRAPHICS_NORMAL );
-}
-if(uiMinute >=30 && uiMinute < 40){
-        dmd.drawString(  30,  0, "Thirty", 6, GRAPHICS_NORMAL );
-}
-if(uiMinute >=40 && uiMinute < 50){
-        dmd.drawString(  35,  0, "Forty", 5, GRAPHICS_NORMAL );
-}
-if(uiMinute >=50 && uiMinute < 60){
-        dmd.drawString(  35,  0, "Fifty", 5, GRAPHICS_NORMAL );
+if(uiMinute == 4){
+  dmd.drawString(  0,  9, "Oh Four ", 8, GRAPHICS_NORMAL );
 }
 
- 
-if(uiMinute%10 == 1){
-        dmd.drawString(  11,  9, "One", 5, GRAPHICS_NORMAL );
+if(uiMinute == 5){
+  dmd.drawString(  0,  9, "Oh Five ", 8, GRAPHICS_NORMAL );
 }
 
-if(uiMinute%10 == 2){
-        dmd.drawString(  11,  9, "Two", 5, GRAPHICS_NORMAL );
+if(uiMinute == 6){
+  dmd.drawString(  0,  9, "Oh Six  ", 8, GRAPHICS_NORMAL );
 }
 
-if(uiMinute%10 == 3){
-        dmd.drawString(  11,  9, "Three", 5, GRAPHICS_NORMAL );
+if(uiMinute == 7){
+  dmd.drawString(  0,  9, "Oh Seven", 8, GRAPHICS_NORMAL );
 }
 
-if(uiMinute%10 == 4){
-        dmd.drawString(  11,  9, "Four", 5, GRAPHICS_NORMAL );
+if(uiMinute == 8){
+  dmd.drawString(  0,  9, "Oh Eight", 8, GRAPHICS_NORMAL );
 }
 
-if(uiMinute%10 == 5){
-        dmd.drawString(  11,  9, "Five", 5, GRAPHICS_NORMAL );
+if(uiMinute == 9){
+  dmd.drawString(  0,  9, "Oh Nine ", 8, GRAPHICS_NORMAL );
 }
 
-if(uiMinute%10 == 6){
-        dmd.drawString(  11,  9, "Six", 5, GRAPHICS_NORMAL );
-}
-
-if(uiMinute%10 == 7){
-        dmd.drawString(  11,  9, "Seven", 5, GRAPHICS_NORMAL );
-}
-
-if(uiMinute%10 == 8){
-        dmd.drawString(  11,  9, "Eight", 5, GRAPHICS_NORMAL );
-}
-
-if(uiMinute%10 == 9){
-        dmd.drawString(  11,  9, "Nine", 5, GRAPHICS_NORMAL );
-}
-
-// end of above 20 display
 }
 
 //end of the display routine
 }
 
 //end of modes
+
+//what is special about today?
+
+void showToday(int uiMonth, int uiDay){
+  
+ if(uiMonth == 12 && uiDay == 25){
+  dmd.clearScreen( true );
+   delay(1000);
+   dmd.drawMarquee("  Ho, Ho, Ho it's Christmas    ",30,(32*DISPLAYS_ACROSS)-1,4);
+   long start=millis();
+   long timer=start;
+   boolean ret=false;
+   while(!ret){
+     if ((timer+35) < millis()) {
+       ret=dmd.stepMarquee(-1,0);
+       timer=millis();
+     }
+   }
+ }
+
+if(uiMonth == 6 && uiDay == 12){
+  dmd.clearScreen( true );
+   delay(1000);
+   dmd.drawMarquee("  It's your birthday!  ",23,(32*DISPLAYS_ACROSS)-1,4);
+   long start=millis();
+   long timer=start;
+   boolean ret=false;
+   while(!ret){
+     if ((timer+35) < millis()) {
+       ret=dmd.stepMarquee(-1,0);
+       timer=millis();
+     }
+   }
+ }
+ 
+else{
+ dmd.clearScreen( true );
+   delay(1000);
+   dmd.drawMarquee("  Nothing special about today that I know of  ",45,(32*DISPLAYS_ACROSS)-1,4);
+   long start=millis();
+   long timer=start;
+   boolean ret=false;
+   while(!ret){
+     if ((timer+35) < millis()) {
+       ret=dmd.stepMarquee(-1,0);
+       timer=millis();
+     }
+   }
+} 
+}
 
 //Display the help screen
 void showHelp(){
@@ -881,7 +912,7 @@ void showHelp(){
    noTone(speakerPin);              // end beep
    dmd.selectFont(System5x7);
    dmd.drawString(  0,  0, "Hh Mm Dd Nn", 11, GRAPHICS_NORMAL );
-   dmd.drawString(  0,  9, "Yy B  +- Ii" ,11, GRAPHICS_NORMAL );
+   dmd.drawString(  0,  9, "Yy B +- Ii?" ,11, GRAPHICS_NORMAL );
    delay(1000);
 }  
 
