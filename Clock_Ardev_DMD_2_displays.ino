@@ -52,16 +52,16 @@ add a word clock mode eg Seven Forty Four PM
 #define clockPin A5  // The I2C CLOCK pin
 
 
-unsigned int hourNow;  //Self explanatory
-unsigned int minuteNow;
-unsigned int secondNow;
-unsigned int dayNow;
-unsigned int monthNow;
-unsigned int yearNow;
-unsigned int weekdayNow;
-unsigned int pollDelay = 3000;   // time between temperature samples in milliSeconds
-unsigned int previousMillis; // A variable to hold the last millis time
-unsigned int mode = 3; // a variable to hold the mode
+ int hourNow;  //Self explanatory
+ int minuteNow;
+ int secondNow;
+ int dayNow;
+ int monthNow;
+ int yearNow;
+ int weekdayNow;
+ int pollDelay = 3000;   // time between temperature samples in milliSeconds
+ int previousMillis; // A variable to hold the last millis time
+ int mode = 4; // a variable to hold the mode
 
 int currentTemp = 0;
 int incomingByte;      // A variable to read incoming mySerial data into
@@ -207,16 +207,13 @@ ShowDisplayData(mode);  //Show clock
       mySerial.print("Mode: ");
       mySerial.println(mode);
       dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
-  
+  }
   if (incomingByte == '5') {
       mode = 5;
       mySerial.print("Mode: ");
       mySerial.println(mode);
       dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
   }
-  
-}
-  
   
 //beep the buzzer
   if (incomingByte == 'B') {
@@ -624,8 +621,8 @@ switch(uiMonth){
    dmd.drawChar( 59,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
    
 // now show temperature
-   dmd.drawChar(  47,  0,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  53,  0, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawChar(  45,  0,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  52,  0, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
    dmd.drawString(  59, 0, "C", 1, GRAPHICS_NORMAL );  // show the word degreees
 
 //end of the display routine
@@ -651,24 +648,6 @@ void mode3Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMont
 }
 
 void mode4Display(unsigned int uiWeekday,unsigned int uiDay, unsigned int uiMonth, unsigned int uiYear, unsigned int uiMinute, byte bColonOn, unsigned int uiHour,  unsigned int uiTemperature){
-
-  
-    // check if its on the hour and beep the clock if you like
-if((second() == 0) && (minute() == 0)){
-  mySerial.println("its right on the hour");
-//beep the buzzer
-mySerial.println("Beep");
-tone(speakerPin, 1200);          // begin tone at 1200 hertz
-delay(150);                      // wait half a sec
-noTone(speakerPin);              // end beep
-   dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
-// now show temperature
-   dmd.drawChar(  3,  4,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  9,  4, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawString(  20, 4, "Degrees", 7, GRAPHICS_NORMAL );  // show the word degreees
-   delay(3000);
-   dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
-}
 
  // Show day of week
    switch(uiWeekday){
@@ -701,11 +680,16 @@ noTone(speakerPin);              // end beep
 
 //draw the time
    dmd.selectFont(System5x7);
-   dmd.drawChar(  18,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
-   dmd.drawChar(  24,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
-   dmd.drawChar(  30,  9,'.', GRAPHICS_NORMAL );   // colon
-   dmd.drawChar( 35,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
-   dmd.drawChar( 41,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
+   dmd.drawChar(  3,  9,'0'+((uiHour%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  10,  9, '0'+ (uiHour%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawChar(  16,  9,'.', GRAPHICS_NORMAL );   // colon
+   dmd.drawChar( 21,  9, '0'+((uiMinute%100)  /10),   GRAPHICS_NORMAL );      // third digit
+   dmd.drawChar( 27,  9, '0'+ (uiMinute%10),          GRAPHICS_NORMAL );   // fourth digit
+
+// now show temperature
+   dmd.drawChar(  47,  9,'0'+((uiTemperature%100)/10), GRAPHICS_NORMAL );   // first digit
+   dmd.drawChar(  53,  9, '0'+ (uiTemperature%10),  GRAPHICS_NORMAL );   // second digit
+   dmd.drawString(  59, 9, "C", 7, GRAPHICS_NORMAL );  // show the word degreees
 
 //end of the display routine
 }
